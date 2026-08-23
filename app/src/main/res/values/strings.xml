@@ -1,0 +1,7 @@
+<resources>
+    <string name="app_name">BrowseEvo</string>
+    <string name="tab_bookmark">书签</string>
+    <string name="tab_history">历史</string>
+    <string name="download_action_resume">继续</string>
+    <string name="download_action_pause">暂停</string>
+</resources>

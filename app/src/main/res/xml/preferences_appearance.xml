@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.preference.PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+    <DropDownPreference
+        android:key="device_type"
+        android:title="布局类型"
+        android:icon="@drawable/responsive_layout_24px"
+        android:entries="@array/device_types"
+        android:entryValues="@array/device_type_values"
+        app:useSimpleSummaryProvider="true"/>
+</androidx.preference.PreferenceScreen>

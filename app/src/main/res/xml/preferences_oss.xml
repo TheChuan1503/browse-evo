@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.preference.PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
+    <Preference
+        android:title="Activity Kotlin Extensions"
+        android:summary="Apache-2.0 license"/>
+    <Preference
+        android:title="AndroidX Preference"
+        android:summary="Apache-2.0 license"/>
+    <Preference
+        android:title="Annotation"
+        android:summary="Apache-2.0 license"/>
+    <Preference
+        android:title="AppCompat"
+        android:summary="Apache-2.0 license"/>
+    <Preference
+        android:title="BaseJson"
+        android:summary="Apache-2.0 license"/>
+    <Preference
+        android:title="BaseOkHttpX"
+        android:summary="Apache-2.0 license"/>
+    <Preference
+        android:title="BrowseEvo"
+        android:summary="Apache-2.0 license"/>
+    <Preference
+        android:title="GeckoView"
+        android:summary="Mozilla Public License 2.0"/>
+    <Preference
+        android:title="Lifecycle Runtime"
+        android:summary="Apache-2.0 license"/>
+    <Preference
+        android:title="Material Components For Android"
+        android:summary="Apache-2.0 license"/>
+    <Preference
+        android:title="MTDataFilesProvider"
+        android:summary="林锦斌 (@L-JINBIN)"/>
+    <Preference
+        android:title="OkHttp"
+        android:summary="Apache-2.0 license"/>
+</androidx.preference.PreferenceScreen>

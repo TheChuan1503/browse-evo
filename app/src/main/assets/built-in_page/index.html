@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Browse Evo</title>
+    <link rel="stylesheet" href="libs/beer.min.css">
+    <script type="module" src="libs/beer.min.js"></script>
+    <link rel="stylesheet" href="style.css">
+    <style>
+        .title {
+            color: var(--on-surface);
+            font-size: 36px;
+            text-align: center;
+            display: block;
+            margin-top: 44px;
+            margin-bottom: 44px;
+        }
+        
+        .search-container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 8px;
+            margin: 0 auto;
+            max-width: 360px;
+        }
+        
+        .searcher {
+            flex: 1;
+            min-width: 200px;
+        }
+        
+        .btn-search {
+            flex-shrink: 0;
+        }
+        
+        .btn-search[disabled] {
+            opacity: 0.5;
+            cursor: not-allowed;
+            pointer-events: none;
+        }
+    </style>
+</head>
+
+<body>
+    <span class="title">Browse Evo</span>
+    <div class="search-container">
+        <div class="field border rounded large searcher">
+            <input type="text" class="input-search" placeholder="在 Bing 搜索或输入网址">
+        </div>
+        <button class="border tertiary-border tertiary-text extra btn-search">前往</button>
+    </div>
+    <script src="index.js" defer></script>
+</body>
+
+</html>

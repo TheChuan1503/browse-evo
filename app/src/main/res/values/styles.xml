@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <style name="TextAppearance.EvoPopupMenuItem" parent="TextAppearance.Material3.LabelMedium">
+        <item name="android:textSize">12sp</item>
+    </style>
+
+    <style name="EvoPopupMenuOverlay" parent="">
+        <item name="dropdownListPreferredItemHeight">38dp</item>
+        <item name="textAppearanceLargePopupMenu">@style/TextAppearance.EvoPopupMenuItem</item>
+        <item name="textAppearanceSmallPopupMenu">@style/TextAppearance.EvoPopupMenuItem</item>
+    </style>
+
+</resources>

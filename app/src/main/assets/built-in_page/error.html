@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>未能加载页面</title>
+    <link rel="stylesheet" href="libs/beer.min.css">
+    <script type="module" src="libs/beer.min.js"></script>
+    <link rel="stylesheet" href="style.css">
+    <style>
+        .container {
+            margin: 0 auto;
+            max-width: 600px;
+            padding: 96px 44px 0;
+            color: var(--on-background);
+        }
+
+        .icon {
+            width: 36px;
+            height: 36px;
+            fill: var(--on-background) !important;
+            display: none;
+        }
+
+        .title {
+            color: var(--error);
+            font-size: 18px;
+            margin-top: 12px;
+            font-weight: bold;
+        }
+
+        .error-text {
+            color: var(--on-background) !important;
+            margin-top: 12px;
+        }
+
+        .url {
+            word-break: break-all;
+            overflow-wrap: anywhere;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+
+        .actions {
+            margin-top: 44px;
+        }
+
+        .offline-banner {
+            display: none;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+
+        .icon-cloud-off {
+            width: 14px;
+            height: 14px;
+            fill: var(--on-background) !important;
+            flex-shrink: 0;
+        }
+
+        .url-text {
+            display: inline-block;
+        }
+
+        .url b {
+            vertical-align: top;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="offline-banner">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 -960 960 960" class="icon-cloud-off">
+            <path
+                d="M792-56 686-160H260q-92 0-156-64T40-380q0-77 47.5-137T210-594q3-8 6-15.5t6-16.5L56-792l56-56 736 736-56 56ZM260-240h346L284-562q-2 11-3 21t-1 21h-20q-58 0-99 41t-41 99q0 58 41 99t99 41Zm185-161Zm419 191-58-56q17-14 25.5-32.5T840-340q0-42-29-71t-71-29h-60v-80q0-83-58.5-141.5T480-720q-27 0-52 6.5T380-693l-58-58q35-24 74.5-36.5T480-800q117 0 198.5 81.5T760-520q69 8 114.5 59.5T920-340q0 39-15 72.5T864-210ZM593-479Z" />
+        </svg>
+        未连接到互联网
+    </div>
+    <div class="container">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 -960 960 960" class="icon">
+            <path
+                d="M480-80q-83 0-156-31.5T197-197q-54-54-85.5-127T80-480q0-83 31.5-156T197-763q54-54 127-85.5T480-880q83 0 156 31.5T763-763q54 54 85.5 127T880-480q0 83-31.5 156T763-197q-54 54-127 85.5T480-80Zm0-80q134 0 227-93t93-227q0-7-.5-14.5T799-507q-5 29-27 48t-52 19h-80q-33 0-56.5-23.5T560-520v-40H400v-80q0-33 23.5-56.5T480-720h40q0-23 12.5-40.5T563-789q-20-5-40.5-8t-42.5-3q-134 0-227 93t-93 227h200q66 0 113 47t47 113v40H400v110q20 5 39.5 7.5T480-160Z" />
+        </svg>
+        <div class="title">未能加载页面</div>
+        <div class="error-text"></div>
+        <div class="url">
+            <b>URL:</b>&nbsp;<code><a class="url-text"></a></code>
+        </div>
+        <div class="actions">
+            <button class="btn-reload">重新加载</button>
+        </div>
+    </div>
+    <script src="error.js" defer></script>
+</body>
+
+</html>

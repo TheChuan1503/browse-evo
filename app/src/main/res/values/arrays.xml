@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <array name="device_types">
+        <item>Phone</item>
+        <item>Watch (Square)</item>
+    </array>
+    <array name="device_type_values">
+        <item>phone</item>
+        <item>watch_square</item>
+    </array>
+</resources>
