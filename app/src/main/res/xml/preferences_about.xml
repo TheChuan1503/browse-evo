@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.preference.PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
+    <Preference
+        android:key="app"
+        android:title="@string/app_name"
+        android:summary="v0.0.0"/>
+    <Preference
+        android:key="github"
+        android:title="Github 页面"
+        android:summary="https://github.com/1503dev/browse-evo"
+        android:icon="@drawable/code_xml_24px"/>
+    <Preference
+        android:key="oss"
+        android:title="开放源代码许可"
+        android:icon="@drawable/code_xml_24px"/>
+</androidx.preference.PreferenceScreen>
