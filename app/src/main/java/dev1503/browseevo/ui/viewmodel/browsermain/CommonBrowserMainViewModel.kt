@@ -399,7 +399,6 @@ abstract class CommonBrowserMainViewModel(activity: MainActivity): BrowserMainVi
         applyBarColors(color, textColor)
     }
 
-    /** 夜间模式切换后就地刷新依赖主题的配色,不重建视图、不重载网页。 */
     fun refreshThemeColors() {
         applyDefaultColor()
     }

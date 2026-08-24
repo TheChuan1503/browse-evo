@@ -8,6 +8,8 @@ import androidx.appcompat.app.AppCompatDelegate
 import com.google.android.material.button.MaterialButton
 import dev1503.browseevo.data.NeoSettings
 import dev1503.browseevo.ui.widgets.EvoWebViewWrapper
+import dev1503.materialpopups.MaterialPopups
+import dev1503.materialpopups.Utils
 import org.mozilla.geckoview.GeckoRuntimeSettings
 
 object Utils {
@@ -64,9 +66,21 @@ object Utils {
     fun applySavedNightMode() {
         AppCompatDelegate.setDefaultNightMode(
             when (getDarkModeSetting()) {
-                DARK_MODE_ON -> AppCompatDelegate.MODE_NIGHT_YES
+                DARK_MODE_ON -> {
+                    MaterialPopups.textColor = MaterialPopups.TEXT_COLOR_DARK
+                    MaterialPopups.backgroundColor = MaterialPopups.BACKGROUND_COLOR_DARK
+                    MaterialPopups.backgroundOverlayAlpha = MaterialPopups.BACKGROUND_OVERLAY_ALPHA_DARK
+                    MaterialPopups.backgroundOverlayColor = Utils.applyAlpha(MaterialPopups.textColor, MaterialPopups.backgroundOverlayAlpha)
+                    AppCompatDelegate.MODE_NIGHT_YES
+                }
                 DARK_MODE_RESERVED -> AppCompatDelegate.MODE_NIGHT_FOLLOW_SYSTEM
-                else -> AppCompatDelegate.MODE_NIGHT_NO
+                else -> {
+                    MaterialPopups.textColor = MaterialPopups.TEXT_COLOR_LIGHT
+                    MaterialPopups.backgroundColor = MaterialPopups.BACKGROUND_COLOR_LIGHT
+                    MaterialPopups.backgroundOverlayAlpha = MaterialPopups.BACKGROUND_OVERLAY_ALPHA_LIGHT
+                    MaterialPopups.backgroundOverlayColor = Utils.applyAlpha(MaterialPopups.textColor, MaterialPopups.backgroundOverlayAlpha)
+                    AppCompatDelegate.MODE_NIGHT_NO
+                }
             }
         )
     }

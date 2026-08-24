@@ -18,9 +18,16 @@ class EvoWebViewWrapper(
 ) {
     val geckoView: GeckoView = GeckoView(activity)
 
+    // 最近一次触摸/鼠标事件的屏幕坐标，用于在长按/右键弹出菜单时定位到真实指针位置。
+    var lastPointerX: Int = 0
+        private set
+    var lastPointerY: Int = 0
+        private set
+
     val formalTabs: MutableList<EvoWebViewTab> = mutableListOf()
 
     val geckoRuntime: GeckoRuntime by lazy { initRuntime(activity) }
+
 
     companion object {
         @Volatile
@@ -85,9 +92,28 @@ class EvoWebViewWrapper(
     var onExternalSchemeRequested: ((String) -> Unit)? = null
     var onNavigateRequested: ((String) -> Unit)? = null
     var onDownloadRequested: ((url: String, filename: String?, contentLength: Long) -> Unit)? = null
+    var onContextMenu: ((screenX: Int, screenY: Int, element: GeckoSession.ContentDelegate.ContextElement) -> Unit)? = null
 
     init {
         geckoView.apply {
+            // 触摸：记录按下手指的真实屏幕坐标；返回 false 让 GeckoView 继续正常处理触摸。
+            setOnTouchListener { _, event ->
+                lastPointerX = event.rawX.toInt()
+                lastPointerY = event.rawY.toInt()
+                false
+            }
+            // 鼠标悬停：记录光标位置。
+            setOnHoverListener { _, event ->
+                lastPointerX = event.rawX.toInt()
+                lastPointerY = event.rawY.toInt()
+                false
+            }
+            // 鼠标按键（右键等）：记录按下位置。
+            setOnGenericMotionListener { _, event ->
+                lastPointerX = event.rawX.toInt()
+                lastPointerY = event.rawY.toInt()
+                false
+            }
         }
     }
 
@@ -109,6 +135,9 @@ class EvoWebViewWrapper(
             geckoView.setSession(session)
         }
         tab.onTitleChanged = { title -> if (tab === activeTab) onTitleChanged?.invoke(title) }
+        tab.onContextMenu = { screenX, screenY, element ->
+            if (tab === activeTab) onContextMenu?.invoke(screenX, screenY, element)
+        }
         tab.onNavigationStateChanged = { if (tab === activeTab) onNavigationStateChanged?.invoke() }
         tab.onNavigationRequested = { session, uri ->
             geckoView.setSession(session)

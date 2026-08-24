@@ -17,9 +17,6 @@ class EvoDataStore(val context: Activity): PreferenceDataStore() {
             return
         }
         if (key == Utils.KEY_DARK_MODE) {
-            // DropDownPreference 的 Spinner 初始化时会自动选中第 0 项并调用 putString("0")，
-            // 覆盖 NeoSettings 中已保存的正确值。因此不在这里持久化 dark_mode，
-            // 改为由 AppearanceFragment 的 onPreferenceChangeListener 直接写入 NeoSettings。
             return
         }
         Utils.neoSettings?.putString(key!!, value)
