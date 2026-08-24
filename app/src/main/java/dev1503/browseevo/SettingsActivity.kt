@@ -1,5 +1,6 @@
 package dev1503.browseevo
 
+import android.content.Context
 import android.os.Bundle
 import android.preference.PreferenceManager
 import androidx.activity.enableEdgeToEdge
@@ -17,6 +18,11 @@ import dev1503.browseevo.ui.viewmodel.settings.WatchSquareSettingsViewModel
 
 class SettingsActivity : AppCompatActivity() {
     private lateinit var viewModel: ViewModel
+
+    override fun attachBaseContext(newBase: Context) {
+        super.attachBaseContext(Utils.applyNightModeOverride(newBase))
+    }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
@@ -34,9 +40,11 @@ class SettingsActivity : AppCompatActivity() {
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom)
             insets
         }
-        supportFragmentManager
-            .beginTransaction()
-            .replace(R.id.container, SettingsFragment())
-            .commit()
+        if (savedInstanceState == null) {
+            supportFragmentManager
+                .beginTransaction()
+                .replace(R.id.container, SettingsFragment())
+                .commit()
+        }
     }
 }

@@ -399,6 +399,11 @@ abstract class CommonBrowserMainViewModel(activity: MainActivity): BrowserMainVi
         applyBarColors(color, textColor)
     }
 
+    /** 夜间模式切换后就地刷新依赖主题的配色,不重建视图、不重载网页。 */
+    fun refreshThemeColors() {
+        applyDefaultColor()
+    }
+
     private fun applyDefaultColor() {
         if (!::layoutTopBar.isInitialized) return
         val background = resolveColor(android.R.attr.colorBackground)
@@ -577,7 +582,8 @@ abstract class CommonBrowserMainViewModel(activity: MainActivity): BrowserMainVi
             activity,
             onAddBookmarkClick = { showAddBookmark(currentPageTitle(), currentPageUrl()) },
             onShareClick = { Utils.shareUrl(activity, currentPageUrl(), currentPageTitle()) },
-            onViewSourceClick = { viewCurrentPageSource() }
+            onViewSourceClick = { viewCurrentPageSource() },
+            onDarkModeToggled = { refreshThemeColors() }
         ).show()
     }
 

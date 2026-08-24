@@ -1,11 +1,21 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <array name="device_types">
+    <string-array name="device_types">
         <item>Phone</item>
         <item>Watch (Square)</item>
-    </array>
-    <array name="device_type_values">
+    </string-array>
+    <string-array name="device_type_values">
         <item>phone</item>
         <item>watch_square</item>
-    </array>
+    </string-array>
+    <string-array name="dark_mode_entries">
+        <item>浅色</item>
+        <item>深色</item>
+        <item>跟随系统</item>
+    </string-array>
+    <string-array name="dark_mode_entry_values">
+        <item>0</item>
+        <item>1</item>
+        <item>2</item>
+    </string-array>
 </resources>

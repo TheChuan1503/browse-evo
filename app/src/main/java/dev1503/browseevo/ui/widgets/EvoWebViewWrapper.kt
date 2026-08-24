@@ -5,9 +5,11 @@ import android.graphics.Bitmap
 import android.os.Build
 import android.view.View
 import dev1503.browseevo.EvoWebViewTab
+import dev1503.browseevo.Utils
 import dev1503.browseevo.data.HistoryManager
 import org.mozilla.geckoview.GeckoResult
 import org.mozilla.geckoview.GeckoRuntime
+import org.mozilla.geckoview.GeckoRuntimeSettings
 import org.mozilla.geckoview.GeckoSession
 import org.mozilla.geckoview.GeckoView
 
@@ -28,11 +30,20 @@ class EvoWebViewWrapper(
         var userAgentOverride: String? = null
             private set
 
+        fun resetRuntime() {
+            synchronized(this) {
+                runtimeInstance = null
+            }
+        }
+
         private fun initRuntime(activity: Activity): GeckoRuntime {
             if (runtimeInstance != null) return runtimeInstance!!
             synchronized(this) {
                 if (runtimeInstance != null) return runtimeInstance!!
-                val runtime = GeckoRuntime.create(activity)
+                val settings = GeckoRuntimeSettings.Builder()
+                    .preferredColorScheme(Utils.getPreferredColorScheme())
+                    .build()
+                val runtime = GeckoRuntime.create(activity, settings)
                 val defaultUa = GeckoSession.getDefaultUserAgent()
                 if (!defaultUa.isNullOrEmpty()) {
                     val appVersion = try {
