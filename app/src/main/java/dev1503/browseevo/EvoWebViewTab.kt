@@ -126,6 +126,12 @@ class EvoWebViewTab(
         EvoWebViewWrapper.userAgentOverride?.let { session.settings.userAgentOverride = it }
     }
 
+    fun updateAllSessionsUserAgent() {
+        for (session in sessionStack) {
+            applyUserAgentOverride(session)
+        }
+    }
+
     private fun createNavigationDelegate(): GeckoSession.NavigationDelegate {
         return object : GeckoSession.NavigationDelegate {
             override fun onNewSession(session: GeckoSession, uri: String): GeckoResult<GeckoSession> {

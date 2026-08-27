@@ -89,6 +89,16 @@ class WatchSquareBrowserMainViewModel(activity: MainActivity) : CommonBrowserMai
                     dismiss()
                     viewCurrentPageSource()
                 }
+                adapter.page2View?.findViewById<MaterialButton>(R.id.btnPcMode)?.let { button ->
+                    button.isChecked = Utils.isPcMode()
+                    button.setOnClickListener {
+                        Utils.setPcMode(!Utils.isPcMode())
+                        button.isChecked = Utils.isPcMode()
+                        webViewWrapper.updateAllSessionsUserAgent()
+                        webViewWrapper.reload()
+                        dismiss()
+                    }
+                }
             }
         }
         setupPages()

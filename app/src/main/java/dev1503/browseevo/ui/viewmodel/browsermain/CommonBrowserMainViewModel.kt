@@ -582,7 +582,11 @@ abstract class CommonBrowserMainViewModel(activity: MainActivity): BrowserMainVi
             onAddBookmarkClick = { showAddBookmark(currentPageTitle(), currentPageUrl()) },
             onShareClick = { Utils.shareUrl(activity, currentPageUrl(), currentPageTitle()) },
             onViewSourceClick = { viewCurrentPageSource() },
-            onDarkModeToggled = { refreshThemeColors() }
+            onDarkModeToggled = { refreshThemeColors() },
+            onPcModeToggled = {
+                webViewWrapper.updateAllSessionsUserAgent()
+                webViewWrapper.reload()
+            }
         ).show()
     }
 
