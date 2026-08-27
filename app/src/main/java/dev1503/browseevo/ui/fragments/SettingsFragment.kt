@@ -10,14 +10,13 @@ import androidx.preference.PreferenceFragmentCompat
 import dev1503.browseevo.EvoDataStore
 import dev1503.browseevo.R
 
-
 class SettingsFragment : PreferenceFragmentCompat(), Preference.OnPreferenceClickListener {
     override fun onCreatePreferences(savedInstanceState: Bundle?, rootKey: String?) {
         setPreferencesFromResource(R.xml.preferences_settings, rootKey)
         findPreference<Preference>("appearance")?.onPreferenceClickListener = this
         findPreference<Preference>("about")?.onPreferenceClickListener = this
         val dataStore = EvoDataStore(requireActivity())
-        preferenceManager.preferenceDataStore = dataStore;
+        preferenceManager.preferenceDataStore = dataStore
     }
 
     override fun onPreferenceClick(preference: Preference): Boolean {

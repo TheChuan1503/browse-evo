@@ -2,12 +2,24 @@ package dev1503.browseevo
 
 import android.content.Context
 import android.content.Intent
+import android.content.res.Configuration
 import android.view.View
+import androidx.appcompat.app.AppCompatDelegate
 import com.google.android.material.button.MaterialButton
 import dev1503.browseevo.data.NeoSettings
+import dev1503.browseevo.ui.widgets.EvoWebViewWrapper
+import dev1503.materialpopups.MaterialPopups
+import dev1503.materialpopups.Utils
+import org.mozilla.geckoview.GeckoRuntimeSettings
 
 object Utils {
     var neoSettings: NeoSettings? = null
+
+    const val KEY_DARK_MODE = "appearance/dark_mode"
+
+    const val DARK_MODE_OFF = 0
+    const val DARK_MODE_ON = 1
+    const val DARK_MODE_RESERVED = 2
 
     fun openHistoryActivity(context: Context, tab: String) {
         context.startActivity(
@@ -34,11 +46,90 @@ object Utils {
         context.startActivity(Intent.createChooser(intent, "分享网页"))
     }
 
+    fun getDarkModeSetting(): Int =
+        when (neoSettings?.getInt(KEY_DARK_MODE, DARK_MODE_OFF)) {
+            DARK_MODE_ON -> DARK_MODE_ON
+            DARK_MODE_RESERVED -> DARK_MODE_RESERVED
+            else -> DARK_MODE_OFF
+        }
+
+    fun setDarkModeSetting(value: Int) {
+        neoSettings?.putInt(KEY_DARK_MODE, value)
+    }
+
+    fun getPreferredColorScheme(): Int =
+        when (getDarkModeSetting()) {
+            DARK_MODE_ON -> GeckoRuntimeSettings.COLOR_SCHEME_DARK
+            DARK_MODE_OFF -> GeckoRuntimeSettings.COLOR_SCHEME_LIGHT
+            else -> GeckoRuntimeSettings.COLOR_SCHEME_LIGHT
+        }
+    fun applySavedNightMode() {
+        AppCompatDelegate.setDefaultNightMode(
+            when (getDarkModeSetting()) {
+                DARK_MODE_ON -> {
+                    MaterialPopups.textColor = MaterialPopups.TEXT_COLOR_DARK
+                    MaterialPopups.backgroundColor = MaterialPopups.BACKGROUND_COLOR_DARK
+                    MaterialPopups.backgroundOverlayAlpha = MaterialPopups.BACKGROUND_OVERLAY_ALPHA_DARK
+                    MaterialPopups.backgroundOverlayColor = Utils.applyAlpha(MaterialPopups.textColor, MaterialPopups.backgroundOverlayAlpha)
+                    AppCompatDelegate.MODE_NIGHT_YES
+                }
+                DARK_MODE_RESERVED -> AppCompatDelegate.MODE_NIGHT_FOLLOW_SYSTEM
+                else -> {
+                    MaterialPopups.textColor = MaterialPopups.TEXT_COLOR_LIGHT
+                    MaterialPopups.backgroundColor = MaterialPopups.BACKGROUND_COLOR_LIGHT
+                    MaterialPopups.backgroundOverlayAlpha = MaterialPopups.BACKGROUND_OVERLAY_ALPHA_LIGHT
+                    MaterialPopups.backgroundOverlayColor = Utils.applyAlpha(MaterialPopups.textColor, MaterialPopups.backgroundOverlayAlpha)
+                    AppCompatDelegate.MODE_NIGHT_NO
+                }
+            }
+        )
+    }
+    fun applyNightModeOverride(base: Context): Context {
+        val mask = when (getDarkModeSetting()) {
+            DARK_MODE_ON -> Configuration.UI_MODE_NIGHT_YES
+            DARK_MODE_OFF -> Configuration.UI_MODE_NIGHT_NO
+            else -> return base
+        }
+        return try {
+            val config = Configuration(base.resources.configuration)
+            config.uiMode = mask or (config.uiMode and Configuration.UI_MODE_NIGHT_MASK.inv())
+            base.createConfigurationContext(config)
+        } catch (_: Exception) {
+            base
+        }
+    }
+
+    fun cycleDarkMode() {
+        setDarkModeSetting(
+            when (getDarkModeSetting()) {
+                DARK_MODE_OFF -> DARK_MODE_ON
+                DARK_MODE_ON -> DARK_MODE_RESERVED
+                else -> DARK_MODE_OFF
+            }
+        )
+        EvoWebViewWrapper.resetRuntime()
+        applySavedNightMode()
+    }
+
+    private fun refreshDarkModeButton(button: MaterialButton) {
+        val setting = getDarkModeSetting()
+        button.isChecked = setting != DARK_MODE_OFF
+        button.text = if (setting == DARK_MODE_RESERVED) "跟随系统" else "夜间模式"
+    }
+
     fun bindMenuPageButtons(
         page1View: View,
         onAddBookmarkClick: () -> Unit,
         onShareClick: (() -> Unit)? = null,
+        onDarkModeToggleClick: (() -> Unit)? = null,
     ) {
+        page1View.findViewById<MaterialButton>(R.id.btnDarkMode)?.let { button ->
+            refreshDarkModeButton(button)
+            button.setOnClickListener {
+                val handler = onDarkModeToggleClick
+                if (handler != null) handler() else cycleDarkMode()
+            }
+        }
         page1View.findViewById<MaterialButton>(R.id.btnBookmarks)?.setOnClickListener {
             openHistoryActivity(page1View.context, HistoryActivity.TAB_BOOKMARK)
         }

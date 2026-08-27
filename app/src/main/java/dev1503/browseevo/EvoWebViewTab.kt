@@ -68,6 +68,7 @@ class EvoWebViewTab(
     var onExternalSchemeRequested: ((String) -> Unit)? = null
     var onNavigateRequested: ((String) -> Unit)? = null
     var onDownloadRequested: ((url: String, filename: String?, contentLength: Long) -> Unit)? = null
+    var onContextMenu: ((screenX: Int, screenY: Int, element: GeckoSession.ContentDelegate.ContextElement) -> Unit)? = null
 
     val currentUrl: String
         get() = currentSession?.let { urlMap[it] } ?: ""
@@ -273,6 +274,10 @@ class EvoWebViewTab(
                         .find(header)?.groupValues?.get(1)
                 }
                 onDownloadRequested?.invoke(response.uri, filename, contentLength)
+            }
+
+            override fun onContextMenu(session: GeckoSession, screenX: Int, screenY: Int, element: GeckoSession.ContentDelegate.ContextElement) {
+                onContextMenu?.invoke(screenX, screenY, element)
             }
         }
     }

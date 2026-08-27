@@ -93,4 +93,5 @@ dependencies {
     implementation("com.squareup.okhttp3:okhttp:4.12.0")
     implementation("com.github.L-JINBIN:MTDataFilesProvider:v1.0.0")
     implementation("androidx.preference:preference:1.2.1")
+    implementation(files("libs/MaterialPopups-debug.aar"))
 }

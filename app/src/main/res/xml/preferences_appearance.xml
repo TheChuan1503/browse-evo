@@ -8,4 +8,11 @@
         android:entries="@array/device_types"
         android:entryValues="@array/device_type_values"
         app:useSimpleSummaryProvider="true"/>
+    <DropDownPreference
+        android:key="appearance/dark_mode"
+        android:title="夜间模式"
+        android:icon="@drawable/moon_stars_24px"
+        android:entries="@array/dark_mode_entries"
+        android:entryValues="@array/dark_mode_entry_values"
+        app:useSimpleSummaryProvider="true"/>
 </androidx.preference.PreferenceScreen>

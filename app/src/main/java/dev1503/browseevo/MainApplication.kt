@@ -12,5 +12,6 @@ class MainApplication : Application() {
         super.onCreate()
         neoSettings = NeoSettings(this, File(filesDir, "neo_settings.json").absolutePath)
         Utils.neoSettings = neoSettings
+        Utils.applySavedNightMode()
     }
 }

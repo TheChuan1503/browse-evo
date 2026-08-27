@@ -1,5 +1,6 @@
 package dev1503.browseevo
 
+import android.content.Context
 import android.content.res.Configuration
 import android.os.Bundle
 import androidx.activity.enableEdgeToEdge
@@ -18,6 +19,10 @@ class DownloadManagerActivity : AppCompatActivity() {
     }
 
     private lateinit var viewModel: ViewModel
+
+    override fun attachBaseContext(newBase: Context) {
+        super.attachBaseContext(Utils.applyNightModeOverride(newBase))
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)

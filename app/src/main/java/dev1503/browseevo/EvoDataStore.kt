@@ -16,6 +16,9 @@ class EvoDataStore(val context: Activity): PreferenceDataStore() {
             requestRestart()
             return
         }
+        if (key == Utils.KEY_DARK_MODE) {
+            return
+        }
         Utils.neoSettings?.putString(key!!, value)
     }
 
@@ -24,14 +27,22 @@ class EvoDataStore(val context: Activity): PreferenceDataStore() {
             return android.preference.PreferenceManager.getDefaultSharedPreferences(context)
                 .getString(PREF_KEY_DEVICE_TYPE, defValue)
         }
+        if (key == Utils.KEY_DARK_MODE) {
+            return Utils.neoSettings?.getInt(key, 0).toString()
+        }
         return Utils.neoSettings?.getString(key!!, defValue)
+    }
+
+    override fun getInt(key: String?, defValue: Int): Int {
+        return Utils.neoSettings?.getInt(key!!, defValue) ?: defValue
+    }
+
+    override fun putInt(key: String?, value: Int) {
+        Utils.neoSettings?.putInt(key!!, value)
     }
 
     fun requestRestart() {
         val snackbar = Snackbar.make(context.window.decorView, "重启以应用更改", Snackbar.LENGTH_SHORT)
-//        snackbar.setAction("重启") {
-//
-//        }
         snackbar.show()
     }
 }

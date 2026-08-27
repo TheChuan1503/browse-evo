@@ -399,6 +399,10 @@ abstract class CommonBrowserMainViewModel(activity: MainActivity): BrowserMainVi
         applyBarColors(color, textColor)
     }
 
+    fun refreshThemeColors() {
+        applyDefaultColor()
+    }
+
     private fun applyDefaultColor() {
         if (!::layoutTopBar.isInitialized) return
         val background = resolveColor(android.R.attr.colorBackground)
@@ -577,7 +581,8 @@ abstract class CommonBrowserMainViewModel(activity: MainActivity): BrowserMainVi
             activity,
             onAddBookmarkClick = { showAddBookmark(currentPageTitle(), currentPageUrl()) },
             onShareClick = { Utils.shareUrl(activity, currentPageUrl(), currentPageTitle()) },
-            onViewSourceClick = { viewCurrentPageSource() }
+            onViewSourceClick = { viewCurrentPageSource() },
+            onDarkModeToggled = { refreshThemeColors() }
         ).show()
     }
 

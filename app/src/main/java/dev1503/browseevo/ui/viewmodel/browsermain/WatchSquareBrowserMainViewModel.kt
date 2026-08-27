@@ -59,29 +59,39 @@ class WatchSquareBrowserMainViewModel(activity: MainActivity) : CommonBrowserMai
     override fun showMenu() {
         val content = LayoutInflater.from(activity).inflate(R.layout.bottom_sheet_menu, null)
         val viewPager = content.findViewById<ViewPager>(R.id.viewPager)
-        val adapter = MenuPagerAdapter(
-            firstPageLayout = R.layout.layout_bottom_sheet_menu_watch_1,
-            secondPageLayout = R.layout.layout_bottom_sheet_menu_2
-        )
-        viewPager.adapter = adapter
         var overlay: View? = null
         val dismiss: () -> Unit = { overlay?.let { dismissOverlay(it) } }
-        viewPager.post {
-            adapter.page1View?.findViewById<MaterialButton>(R.id.btnTools)?.setOnClickListener {
-                viewPager.setCurrentItem(1, true)
-            }
-            adapter.page1View?.let {
-                Utils.bindMenuPageButtons(
-                    it,
-                    onAddBookmarkClick = { showAddBookmark(currentPageTitle(), currentPageUrl()) },
-                    onShareClick = { Utils.shareUrl(activity, currentPageUrl(), currentPageTitle()) }
-                )
-            }
-            adapter.page2View?.findViewById<MaterialButton>(R.id.btnViewSource)?.setOnClickListener {
-                dismiss()
-                viewCurrentPageSource()
+
+        // 实例化并绑定两页菜单。
+        fun setupPages() {
+            val adapter = MenuPagerAdapter(
+                firstPageLayout = R.layout.layout_bottom_sheet_menu_watch_1,
+                secondPageLayout = R.layout.layout_bottom_sheet_menu_2
+            )
+            viewPager.adapter = adapter
+            viewPager.post {
+                adapter.page1View?.findViewById<MaterialButton>(R.id.btnTools)?.setOnClickListener {
+                    viewPager.setCurrentItem(1, true)
+                }
+                adapter.page1View?.let {
+                    Utils.bindMenuPageButtons(
+                        it,
+                        onAddBookmarkClick = { showAddBookmark(currentPageTitle(), currentPageUrl()) },
+                        onShareClick = { Utils.shareUrl(activity, currentPageUrl(), currentPageTitle()) },
+                        onDarkModeToggleClick = {
+                            Utils.cycleDarkMode()
+                            refreshThemeColors()
+                            dismiss()
+                        }
+                    )
+                }
+                adapter.page2View?.findViewById<MaterialButton>(R.id.btnViewSource)?.setOnClickListener {
+                    dismiss()
+                    viewCurrentPageSource()
+                }
             }
         }
+        setupPages()
         overlay = OverlayBuilder(activity)
             .title("Menu")
             .view(content)

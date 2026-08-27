@@ -1,12 +1,16 @@
 package dev1503.browseevo.ui.viewmodel.browsermain
 
 import android.animation.ValueAnimator
+import android.content.ClipData
+import android.content.ClipboardManager
+import android.content.Context
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
 import android.view.View
 import android.view.animation.LinearInterpolator
 import android.widget.TextView
+import android.widget.Toast
 import androidx.appcompat.widget.AppCompatEditText
 import com.google.android.material.button.MaterialButton
 import com.google.android.material.progressindicator.LinearProgressIndicator
@@ -16,6 +20,9 @@ import dev1503.browseevo.R
 import dev1503.browseevo.Utils
 import dev1503.browseevo.ui.viewmodel.ViewModel
 import dev1503.browseevo.ui.widgets.EvoWebViewWrapper
+import dev1503.materialpopups.widgets.menuitem.MenuItem
+import dev1503.materialpopups.widgets.popup.MenuPopup
+import dev1503.materialpopups.widgets.popup.Popup
 import java.net.URLEncoder
 
 open class BrowserMainViewModel(override val activity: MainActivity): ViewModel(activity) {
@@ -60,6 +67,24 @@ open class BrowserMainViewModel(override val activity: MainActivity): ViewModel(
         webViewWrapper.onPageStarted = { onPageStarted() }
         webViewWrapper.onProgressChanged = { progress -> animateProgress(progress) }
         webViewWrapper.onLoadingChanged = { loading -> onLoadingStateChanged(loading) }
+        webViewWrapper.onContextMenu = { _, _, element ->
+            if (element.linkUri != null) {
+                val linkUrl: String = element.linkUri.toString()
+                MenuPopup(activity).addMenuItem(MenuItem("在新标签页中打开链接", { v->
+                    webViewWrapper.createTab().loadUrl(linkUrl)
+                    webViewWrapper.switchToTab(webViewWrapper.getTabCount() - 1)
+                }).setIcon(R.drawable.open_in_new_24px))
+                    .addDivider()
+                    .addMenuItem(MenuItem("复制链接地址", { v->
+                    val clipboard = activity.getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
+                    clipboard.setPrimaryClip(ClipData.newPlainText("url", linkUrl))
+                    Toast.makeText(activity, "已复制链接", Toast.LENGTH_SHORT).show()
+                }))
+                    .build()
+                    .setAnimation(Popup.ANIM_FADE)
+                    .showAt(webViewWrapper.lastPointerX, webViewWrapper.lastPointerY)
+            }
+        }
 
         webViewWrapper.loadBuiltInPage()
     }
