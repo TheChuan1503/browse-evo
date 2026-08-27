@@ -11,6 +11,16 @@
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1.0"
+            android:text="电脑模式"
+            android:id="@+id/btnPcMode"
+            android:checkable="true"
+            app:icon="@drawable/desktop_windows_24px"
+            app:iconGravity="top"
+            style="@style/Widget.Material3.Button.IconButton.Filled.Tonal" />
+        <com.google.android.material.button.MaterialButton
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1.0"
             android:text="源码"
             android:id="@+id/btnViewSource"
             app:icon="@drawable/code_xml_24px"

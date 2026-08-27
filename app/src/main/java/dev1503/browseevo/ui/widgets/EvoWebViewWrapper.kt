@@ -37,10 +37,19 @@ class EvoWebViewWrapper(
         var userAgentOverride: String? = null
             private set
 
+        private var mobileUserAgent: String? = null
+        private var desktopUserAgent: String? = null
+
         fun resetRuntime() {
             synchronized(this) {
                 runtimeInstance = null
             }
+        }
+
+        fun rebuildUserAgent() {
+            val mobile = mobileUserAgent ?: return
+            val pcMode = Utils.isPcMode()
+            userAgentOverride = if (pcMode) (desktopUserAgent ?: mobile) else mobile
         }
 
         private fun initRuntime(activity: Activity): GeckoRuntime {
@@ -63,7 +72,15 @@ class EvoWebViewWrapper(
                         Regex("""Android [\d.]+;"""),
                         "Android ${Build.VERSION.RELEASE};"
                     )
-                        userAgentOverride = "$ua BrowseEvo/$appVersion"
+                    mobileUserAgent = "$ua BrowseEvo/$appVersion"
+                    desktopUserAgent = mobileUserAgent!!.replaceFirst(
+                        Regex("""Android [\d.]+;"""),
+                        "Windows NT 10.0;"
+                    ).replace(
+                        Regex("""\bMobile\b"""),
+                        "x64"
+                    )
+                    userAgentOverride = if (Utils.isPcMode()) desktopUserAgent else mobileUserAgent
                 }
                 runtimeInstance = runtime
                 return runtime
@@ -246,6 +263,12 @@ class EvoWebViewWrapper(
 
     fun reload() {
         activeTab?.reload()
+    }
+
+    fun updateAllSessionsUserAgent() {
+        for (tab in formalTabs) {
+            tab.updateAllSessionsUserAgent()
+        }
     }
 
     val isLoading: Boolean

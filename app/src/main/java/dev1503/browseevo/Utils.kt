@@ -16,6 +16,7 @@ object Utils {
     var neoSettings: NeoSettings? = null
 
     const val KEY_DARK_MODE = "appearance/dark_mode"
+    const val KEY_PC_MODE = "browse/pc_mode"
 
     const val DARK_MODE_OFF = 0
     const val DARK_MODE_ON = 1
@@ -97,6 +98,13 @@ object Utils {
         } catch (_: Exception) {
             base
         }
+    }
+
+    fun isPcMode(): Boolean = neoSettings?.getBoolean(KEY_PC_MODE, false) ?: false
+
+    fun setPcMode(value: Boolean) {
+        neoSettings?.putBoolean(KEY_PC_MODE, value)
+        EvoWebViewWrapper.rebuildUserAgent()
     }
 
     fun cycleDarkMode() {

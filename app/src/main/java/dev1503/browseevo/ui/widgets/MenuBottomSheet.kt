@@ -13,6 +13,7 @@ class MenuBottomSheet(
     private val onShareClick: (() -> Unit)? = null,
     private val onViewSourceClick: (() -> Unit)? = null,
     private val onDarkModeToggled: (() -> Unit)? = null,
+    private val onPcModeToggled: (() -> Unit)? = null,
 ) {
     private var dialog: BottomSheetDialog? = null
 
@@ -49,6 +50,15 @@ class MenuBottomSheet(
             adapter.page2View?.findViewById<MaterialButton>(R.id.btnViewSource)?.setOnClickListener {
                 dialog?.dismiss()
                 onViewSourceClick?.invoke()
+            }
+            adapter.page2View?.findViewById<MaterialButton>(R.id.btnPcMode)?.let { button ->
+                button.isChecked = Utils.isPcMode()
+                button.setOnClickListener {
+                    Utils.setPcMode(!Utils.isPcMode())
+                    button.isChecked = Utils.isPcMode()
+                    onPcModeToggled?.invoke()
+                    dialog?.dismiss()
+                }
             }
         }
     }
