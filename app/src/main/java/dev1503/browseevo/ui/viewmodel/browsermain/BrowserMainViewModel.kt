@@ -90,9 +90,14 @@ open class BrowserMainViewModel(override val activity: MainActivity): ViewModel(
     }
 
     override fun onResume() {
+        webViewWrapper.onHostResumed()
         val url = PendingNavigation.url ?: return
         PendingNavigation.url = null
         webViewWrapper.goToUrl(url)
+    }
+
+    override fun onHostStopped() {
+        webViewWrapper.onHostStopped()
     }
 
     override fun handleBackPressed(): Boolean {

@@ -62,7 +62,6 @@ class WatchSquareBrowserMainViewModel(activity: MainActivity) : CommonBrowserMai
         var overlay: View? = null
         val dismiss: () -> Unit = { overlay?.let { dismissOverlay(it) } }
 
-        // 实例化并绑定两页菜单。
         fun setupPages() {
             val adapter = MenuPagerAdapter(
                 firstPageLayout = R.layout.layout_bottom_sheet_menu_watch_1,
@@ -298,12 +297,10 @@ class WatchSquareBrowserMainViewModel(activity: MainActivity) : CommonBrowserMai
             MotionEvent.ACTION_UP, MotionEvent.ACTION_CANCEL -> {
                 if (!isPotentialSwipe) {
                     onTitleReleased(v, event)
-                } else if (event.actionMasked == MotionEvent.ACTION_UP) {
-                    v.performClick()
                 }
             }
         }
-        return true
+        return false
     }
 
     private fun onTitleReleased(v: View, event: MotionEvent) {
@@ -323,8 +320,6 @@ class WatchSquareBrowserMainViewModel(activity: MainActivity) : CommonBrowserMai
             } else {
                 webViewWrapper.goForward()
             }
-        } else {
-            v.performClick()
         }
     }
 

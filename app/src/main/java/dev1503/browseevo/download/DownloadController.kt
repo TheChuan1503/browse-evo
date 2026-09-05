@@ -161,8 +161,8 @@ object DownloadController {
         return try {
             val httpUrl = url.toHttpUrlOrNull()
             val path = httpUrl?.pathSegments?.lastOrNull { it.isNotBlank() }
-                ?: url.substringBefore('?').substringAfterLast('/')
-            java.net.URLDecoder.decode(path.substringBefore('?'), "UTF-8")
+                ?: url.substringBefore('?').substringBefore('#').substringAfterLast('/')
+            dev1503.browseevo.Utils.decodeUrlEncoded(path)
                 .ifEmpty { "download_${System.currentTimeMillis()}" }
         } catch (e: Exception) {
             "download_${System.currentTimeMillis()}"

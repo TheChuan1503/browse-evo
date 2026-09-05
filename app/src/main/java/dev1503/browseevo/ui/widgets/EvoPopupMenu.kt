@@ -1,16 +1,41 @@
 package dev1503.browseevo.ui.widgets
 
-import android.view.ContextThemeWrapper
-import android.view.Gravity
 import android.view.View
-import androidx.appcompat.widget.PopupMenu
-import dev1503.browseevo.R
+import dev1503.materialpopups.widgets.menuitem.MenuItem
+import dev1503.materialpopups.widgets.popup.MenuPopup
 
-open class EvoPopupMenu(
-    anchor: View,
-    gravity: Int = Gravity.NO_GRAVITY,
-) : PopupMenu(
-    ContextThemeWrapper(anchor.context, R.style.EvoPopupMenuOverlay),
-    anchor,
-    gravity
-)
+class EvoPopupMenu(private val anchor: View) {
+
+    class MenuEntry(val title: CharSequence)
+
+    private val popup = MenuPopup(anchor.context)
+    private var clickListener: ((MenuEntry) -> Boolean)? = null
+
+    val menu = MenuBuilder()
+
+    inner class MenuBuilder {
+        fun add(title: CharSequence, icResId: Int? = null) {
+            val onClick = View.OnClickListener {
+                val result = clickListener?.invoke(MenuEntry(title)) ?: true
+                popup.setAutoDismiss(result)
+            }
+            popup.addMenuItem(MenuItem(title, onClick).apply {
+                icResId?.let {
+                    setIcon(it)
+                }
+            })
+        }
+        fun addDivider() {
+            popup.addDivider()
+        }
+    }
+
+    fun setOnMenuItemClickListener(listener: (MenuEntry) -> Boolean) {
+        clickListener = listener
+    }
+
+    fun show() {
+        popup.build()
+        popup.showAsDropDown(anchor)
+    }
+}

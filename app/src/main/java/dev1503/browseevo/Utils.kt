@@ -12,6 +12,8 @@ import dev1503.materialpopups.MaterialPopups
 import dev1503.materialpopups.Utils
 import org.mozilla.geckoview.GeckoRuntimeSettings
 
+import java.net.URLDecoder
+
 object Utils {
     var neoSettings: NeoSettings? = null
 
@@ -179,5 +181,19 @@ object Utils {
         val candidate = match.groupValues[1]
         if (candidate.contains('.') || candidate.equals("localhost", ignoreCase = true)) return null
         return candidate.lowercase()
+    }
+
+    /**
+     * 解码 URL 编码的字符串（如文件名）。只在包含 '%' 时尝试解码；
+     * '+' 视为字面字符而非空格（URL 路径与 Content-Disposition 中的 '+' 都是字面量）；
+     * 解码失败时返回原字符串。
+     */
+    fun decodeUrlEncoded(value: String): String {
+        if (!value.contains('%')) return value
+        return try {
+            URLDecoder.decode(value.replace("+", "%2B"), "UTF-8")
+        } catch (e: Exception) {
+            value
+        }
     }
 }

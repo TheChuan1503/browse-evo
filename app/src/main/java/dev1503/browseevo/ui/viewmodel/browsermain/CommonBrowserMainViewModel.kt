@@ -50,6 +50,7 @@ import dev1503.browseevo.download.DownloadController
 import dev1503.browseevo.download.DownloadNotifier
 import dev1503.browseevo.download.DownloadRecord
 import dev1503.browseevo.ui.widgets.BottomSheetDialogBuilder
+import dev1503.browseevo.ui.widgets.EvoPopupMenu
 import dev1503.browseevo.ui.widgets.MenuBottomSheet
 import okhttp3.Call
 import okhttp3.Callback
@@ -123,6 +124,10 @@ abstract class CommonBrowserMainViewModel(activity: MainActivity): BrowserMainVi
                 userEditedUrl = false
             }
             showUrlEditOverlay()
+        }
+        textWebSiteTitle.setOnLongClickListener {
+            showTitleBarMenu()
+            true
         }
         urlEditOverlay.setOnClickListener { hideUrlEditOverlay() }
         btnGo.setOnClickListener { onGoClicked() }
@@ -290,16 +295,16 @@ abstract class CommonBrowserMainViewModel(activity: MainActivity): BrowserMainVi
         userEditedUrl = false
     }
 
-    private fun showUrlEditOverlay() {
+    private fun showUrlEditOverlay(showKeyboard: Boolean = true) {
         urlEditOverlay.alpha = 0f
         urlEditOverlay.visibility = View.VISIBLE
         urlEditOverlay.animate()
             .alpha(1f)
             .setDuration(200L)
             .start()
-        if (requestFocusOnUrlEditShown) editTextUrl.requestFocus()
+        if (requestFocusOnUrlEditShown && showKeyboard) editTextUrl.requestFocus()
         editTextUrl.post {
-            if (!requestFocusOnUrlEditShown) return@post
+            if (!requestFocusOnUrlEditShown || !showKeyboard) return@post
             editTextUrl.selectAll()
             val imm = activity.getSystemService(Context.INPUT_METHOD_SERVICE) as? InputMethodManager
             imm?.showSoftInput(editTextUrl, InputMethodManager.SHOW_IMPLICIT)
@@ -316,6 +321,83 @@ abstract class CommonBrowserMainViewModel(activity: MainActivity): BrowserMainVi
             .setDuration(200L)
             .withEndAction { urlEditOverlay.visibility = View.GONE }
             .start()
+    }
+
+    private fun showTitleBarMenu() {
+        val popup = EvoPopupMenu(textWebSiteTitle)
+        popup.menu.add("复制链接", R.drawable.content_copy_24px)
+        popup.menu.add("复制标题")
+        popup.menu.addDivider()
+        popup.menu.add("粘贴", R.drawable.content_paste_24px)
+        popup.menu.add("粘贴并前往", R.drawable.content_paste_go_24px)
+        popup.setOnMenuItemClickListener { item ->
+            when (item.title) {
+                "复制链接" -> copyCurrentLink()
+                "复制标题" -> copyCurrentTitle()
+                "粘贴" -> pasteFromClipboard()
+                "粘贴并前往" -> pasteFromClipboardAndGo()
+            }
+            true
+        }
+        popup.show()
+    }
+
+    private fun copyCurrentLink() {
+        val url = webViewWrapper.activeTab?.currentUrl.orEmpty()
+        if (url.isEmpty() || isBuiltInPage(url)) {
+            Toast.makeText(activity, "没有可复制的链接", Toast.LENGTH_SHORT).show()
+            return
+        }
+        copyToClipboard("url", url)
+    }
+
+    private fun copyCurrentTitle() {
+        val title = webViewWrapper.activeTab?.currentTitle.orEmpty().trim()
+        if (title.isEmpty()) {
+            Toast.makeText(activity, "没有可复制的标题", Toast.LENGTH_SHORT).show()
+            return
+        }
+        copyToClipboard("title", title)
+    }
+
+    private fun copyToClipboard(label: String, text: String) {
+        val clipboard = activity.getSystemService(Context.CLIPBOARD_SERVICE) as? ClipboardManager
+        if (clipboard == null) {
+            Toast.makeText(activity, "复制失败", Toast.LENGTH_SHORT).show()
+            return
+        }
+        clipboard.setPrimaryClip(ClipData.newPlainText(label, text))
+        Toast.makeText(activity, "已复制", Toast.LENGTH_SHORT).show()
+    }
+
+    private fun clipboardText(): String? {
+        val clipboard = activity.getSystemService(Context.CLIPBOARD_SERVICE) as? ClipboardManager
+            ?: return null
+        val clip = clipboard.primaryClip ?: return null
+        if (clip.itemCount == 0) return null
+        return clip.getItemAt(0).coerceToText(activity)?.toString()
+            ?.trim()?.takeIf { it.isNotEmpty() }
+    }
+
+    private fun pasteFromClipboard() {
+        val text = clipboardText()
+        if (text == null) {
+            Toast.makeText(activity, "剪贴板为空", Toast.LENGTH_SHORT).show()
+            return
+        }
+        programmaticSet = true
+        editTextUrl.setText(text)
+        programmaticSet = false
+        userEditedUrl = false
+        showUrlEditOverlay(showKeyboard = false)
+    }
+
+    private fun pasteFromClipboardAndGo() {
+        val text = clipboardText() ?: run {
+            Toast.makeText(activity, "剪贴板为空", Toast.LENGTH_SHORT).show()
+            return
+        }
+        navigate(text)
     }
 
     final override fun onLoadingStateChanged(loading: Boolean) {

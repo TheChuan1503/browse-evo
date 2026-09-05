@@ -31,6 +31,9 @@
         android:title="Material Components For Android"
         android:summary="Apache-2.0 license"/>
     <Preference
+        android:title="Material Icons"
+        android:summary="Apache-2.0 license"/>
+    <Preference
         android:title="MTDataFilesProvider"
         android:summary="林锦斌 (@L-JINBIN)"/>
     <Preference
