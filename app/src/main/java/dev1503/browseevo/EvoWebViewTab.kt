@@ -57,6 +57,10 @@ class EvoWebViewTab(
         "http", "https", "file", "resource", "about", "data", "javascript", "blob", "view-source"
     )
 
+    companion object {
+        private val pendingTargetUrls = java.util.concurrent.ConcurrentHashMap<GeckoSession, String>()
+    }
+
     var onNewTabRequested: ((GeckoSession) -> Unit)? = null
     var onTitleChanged: ((String?) -> Unit)? = null
     var onNavigationStateChanged: (() -> Unit)? = null
@@ -110,6 +114,7 @@ class EvoWebViewTab(
         session.navigationDelegate = createNavigationDelegate()
         session.contentDelegate = createContentDelegate()
         session.progressDelegate = createProgressDelegate()
+        session.promptDelegate = createPromptDelegate()
         return session
     }
 
@@ -118,8 +123,24 @@ class EvoWebViewTab(
         session.navigationDelegate = createNavigationDelegate()
         session.contentDelegate = createContentDelegate()
         session.progressDelegate = createProgressDelegate()
+        session.promptDelegate = createPromptDelegate()
+        seedPendingTarget(session)
         pendingSessions.add(session)
         return session
+    }
+
+    private fun seedPendingTarget(session: GeckoSession) {
+        pendingTargetUrls[session]?.let { url ->
+            urlMap[session] = url
+            titleMap[session] = url
+        }
+    }
+
+    private fun setPendingTarget(session: GeckoSession, url: String) {
+        if (url.isBlank()) return
+        pendingTargetUrls[session] = url
+        urlMap[session] = url
+        titleMap[session] = url
     }
 
     private fun applyUserAgentOverride(session: GeckoSession) {
@@ -136,6 +157,7 @@ class EvoWebViewTab(
         return object : GeckoSession.NavigationDelegate {
             override fun onNewSession(session: GeckoSession, uri: String): GeckoResult<GeckoSession> {
                 val newSession = GeckoSession()
+                setPendingTarget(newSession, uri)
                 onNewTabRequested?.invoke(newSession)
                 return GeckoResult.fromValue(newSession)
             }
@@ -189,6 +211,7 @@ class EvoWebViewTab(
                     loadingSessions.add(newSession)
                     sessionStack.add(newSession)
                     forwardStack.clear()
+                    setPendingTarget(newSession, translateToEvo(request.uri))
                     onNavigationStateChanged?.invoke()
                     onTitleChanged?.invoke(currentTitle)
                     notifyLoadingChanged()
@@ -219,6 +242,13 @@ class EvoWebViewTab(
                 rejectedPermissions: Boolean
             ) {
                 if (url != null) {
+                    if (url.isBlank() || url.equals("about:blank", ignoreCase = true)) {
+                        if (pendingTargetUrls.containsKey(session) || !urlMap[session].isNullOrEmpty()) {
+                            return
+                        }
+                    } else {
+                        pendingTargetUrls.remove(session)
+                    }
                     val oldUrl = urlMap[session] ?: ""
                     val isDataErrorPage = url.startsWith("data:", ignoreCase = true) && session in errorSessions
                     val displayed = if (isDataErrorPage) {
@@ -261,12 +291,18 @@ class EvoWebViewTab(
     private fun createContentDelegate(): GeckoSession.ContentDelegate {
         return object : GeckoSession.ContentDelegate {
             override fun onTitleChange(session: GeckoSession, title: String?) {
-                titleMap[session] = title ?: ""
+                var displayed = title ?: ""
+                if (displayed.isBlank() || displayed.equals("about:blank", ignoreCase = true)) {
+                    pendingTargetUrls[session]?.let { displayed = it }
+                } else {
+                    pendingTargetUrls.remove(session)
+                }
+                titleMap[session] = displayed
                 if (session == currentSession) {
-                    onTitleChanged?.invoke(title)
+                    onTitleChanged?.invoke(displayed)
                     val url = currentUrl
                     if (shouldRecordUrl(url)) {
-                        historyManager.record(url, title ?: "")
+                        historyManager.record(url, displayed)
                     }
                 }
             }
@@ -278,12 +314,29 @@ class EvoWebViewTab(
                 val filename = disposition?.let { header ->
                     Regex("""filename\*?=(?:UTF-8''|")?([^";]+)""", RegexOption.IGNORE_CASE)
                         .find(header)?.groupValues?.get(1)
-                }
+                }?.let { Utils.decodeUrlEncoded(it) }
                 onDownloadRequested?.invoke(response.uri, filename, contentLength)
             }
 
             override fun onContextMenu(session: GeckoSession, screenX: Int, screenY: Int, element: GeckoSession.ContentDelegate.ContextElement) {
                 onContextMenu?.invoke(screenX, screenY, element)
+            }
+        }
+    }
+
+    private fun createPromptDelegate(): GeckoSession.PromptDelegate {
+        return object : GeckoSession.PromptDelegate {
+            override fun onFilePrompt(
+                session: GeckoSession,
+                filePrompt: GeckoSession.PromptDelegate.FilePrompt
+            ): GeckoResult<GeckoSession.PromptDelegate.PromptResponse> {
+                val result = GeckoResult<GeckoSession.PromptDelegate.PromptResponse>()
+                val launched = FileChooserHelper.launch(context, filePrompt, result)
+                if (!launched) {
+                    Log.w(TAG, "file chooser unavailable, dismiss prompt")
+                    return GeckoResult.fromValue(filePrompt.dismiss())
+                }
+                return result
             }
         }
     }
@@ -360,6 +413,8 @@ class EvoWebViewTab(
         val session = currentSession ?: createSession().also { pushSession(it) }
         pendingSessions.add(session)
         session.loadUri(url)
+        setPendingTarget(session, url)
+        onTitleChanged?.invoke(currentTitle)
     }
 
     fun markPending(session: GeckoSession) {
@@ -633,6 +688,9 @@ class EvoWebViewTab(
     fun getAllSessions(): List<GeckoSession> = sessionStack.toList()
 
     fun close() {
+        for (session in sessionStack) {
+            pendingTargetUrls.remove(session)
+        }
         sessionStack.clear()
         forwardStack.clear()
         pendingSessions.clear()

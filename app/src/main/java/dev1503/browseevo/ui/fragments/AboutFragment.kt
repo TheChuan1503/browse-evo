@@ -19,7 +19,7 @@ class AboutFragment : PreferenceFragmentCompat(), Preference.OnPreferenceClickLi
         val dataStore = EvoDataStore(requireActivity())
         preferenceManager.preferenceDataStore = dataStore
 
-        findPreference<Preference>("app")?.summary = "v0.1.0"
+        findPreference<Preference>("app")?.summary = "v0.3.0"
         findPreference<Preference>("github")?.onPreferenceClickListener = this
         findPreference<Preference>("oss")?.onPreferenceClickListener = this
     }

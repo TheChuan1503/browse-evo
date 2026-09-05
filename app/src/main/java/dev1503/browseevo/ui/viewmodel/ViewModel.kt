@@ -16,6 +16,9 @@ open class ViewModel(open val activity: Activity) {
     open fun onResume() {
 
     }
+    open fun onHostStopped() {
+
+    }
     open fun handleBackPressed(): Boolean {
         return false
     }

@@ -18,7 +18,6 @@ class EvoWebViewWrapper(
 ) {
     val geckoView: GeckoView = GeckoView(activity)
 
-    // 最近一次触摸/鼠标事件的屏幕坐标，用于在长按/右键弹出菜单时定位到真实指针位置。
     var lastPointerX: Int = 0
         private set
     var lastPointerY: Int = 0
@@ -92,6 +91,22 @@ class EvoWebViewWrapper(
 
     private var activeTabIndex: Int = -1
 
+    private var hostStopped = false
+
+    fun onHostStopped() {
+        hostStopped = true
+    }
+
+    fun onHostResumed() {
+        if (!hostStopped) return
+        hostStopped = false
+        val session = activeTab?.currentSession ?: return
+        if (geckoView.session === session) {
+            geckoView.releaseSession()
+        }
+        geckoView.setSession(session)
+    }
+
     val activeTab: EvoWebViewTab?
         get() = formalTabs.getOrNull(activeTabIndex)
 
@@ -113,19 +128,16 @@ class EvoWebViewWrapper(
 
     init {
         geckoView.apply {
-            // 触摸：记录按下手指的真实屏幕坐标；返回 false 让 GeckoView 继续正常处理触摸。
             setOnTouchListener { _, event ->
                 lastPointerX = event.rawX.toInt()
                 lastPointerY = event.rawY.toInt()
                 false
             }
-            // 鼠标悬停：记录光标位置。
             setOnHoverListener { _, event ->
                 lastPointerX = event.rawX.toInt()
                 lastPointerY = event.rawY.toInt()
                 false
             }
-            // 鼠标按键（右键等）：记录按下位置。
             setOnGenericMotionListener { _, event ->
                 lastPointerX = event.rawX.toInt()
                 lastPointerY = event.rawY.toInt()
@@ -220,7 +232,7 @@ class EvoWebViewWrapper(
         tab.markPending(newSession)
         tab.pushSession(newSession)
         geckoView.setSession(newSession)
-        newSession.loadUri(url)
+        tab.loadUrl(url)
     }
 
     fun loadUrl(url: String) {
